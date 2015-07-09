@@ -248,6 +248,15 @@
             jfContent.id = 'jfContent' ;
             document.body.appendChild(jfContent) ;
 
+            port.postMessage({
+                type: "LOCATION",
+                protocol: window.location.protocol,
+                host: window.location.host,
+                path: window.location.path,
+                search: window.location.search,
+                hash: window.location.hash
+            });
+
           // Post the contents of the PRE
             port.postMessage({
               type: "SENDING TEXT",

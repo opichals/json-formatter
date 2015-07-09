@@ -169,6 +169,8 @@
       return span ;
     }
 
+    var loc = '';
+
     // Create template nodes
       var templatesObj = {
         t_kvov: getSpanClass('kvov'),
@@ -266,6 +268,12 @@
               if (value[0] === 'h' && value.substring(0, 4) === 'http') { // crude but fast - some false positives, but rare, and UX doesn't suffer terribly from them.
                 var innerStringA = document.createElement('A') ;
                 innerStringA.href = value ;
+                innerStringA.innerText = escapedString ;
+                innerStringEl.appendChild(innerStringA) ;
+              }
+              else if (value[0] === '/') {
+                var innerStringA = document.createElement('A') ;
+                innerStringA.href = loc.protocol + '//' + loc.host + value;
                 innerStringA.innerText = escapedString ;
                 innerStringEl.appendChild(innerStringA) ;
               }
@@ -406,6 +414,10 @@
         var jsonpFunctionName = null,
             validJsonText
         ;
+
+        if (msg.type === 'LOCATION') {
+            loc = msg;
+        }
 
         if (msg.type === 'SENDING TEXT') {
           // Try to parse as JSON
