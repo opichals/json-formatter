@@ -38,6 +38,7 @@
   "use strict" ;
 
   var jfContent,
+      jsonapiContent,
       pre,
       jfStyleEl,
       slowAnalysisTimeout,
@@ -48,7 +49,7 @@
       exitedNotJsonTime,
       displayedFormattedJsonTime
   ;
-  
+
   // Open the port "jf" now, ready for when we need it
     // console.time('established port') ;
     port = chrome.extension.connect({name: 'jf'}) ;
@@ -81,7 +82,7 @@
 
             jfStyleEl.insertAdjacentHTML(
               'beforeend',
-              'body{-webkit-user-select:text;overflow-y:scroll !important;margin:0;position:relative}#optionBar{-webkit-user-select:none;display:block;position:absolute;top:9px;right:17px}#buttonFormatted,#buttonPlain{-webkit-border-radius:2px;-webkit-box-shadow:0px 1px 3px rgba(0,0,0,0.1);-webkit-user-select:none;background:-webkit-linear-gradient(#fafafa, #f4f4f4 40%, #e5e5e5);border:1px solid #aaa;color:#444;font-size:12px;margin-bottom:0px;min-width:4em;padding:3px 0;position:relative;z-index:10;display:inline-block;width:80px;text-shadow:1px 1px rgba(255,255,255,0.3)}#buttonFormatted{margin-left:0;border-top-left-radius:0;border-bottom-left-radius:0}#buttonPlain{margin-right:0;border-top-right-radius:0;border-bottom-right-radius:0;border-right:none}#buttonFormatted:hover,#buttonPlain:hover{-webkit-box-shadow:0px 1px 3px rgba(0,0,0,0.2);background:#ebebeb -webkit-linear-gradient(#fefefe, #f8f8f8 40%, #e9e9e9);border-color:#999;color:#222}#buttonFormatted:active,#buttonPlain:active{-webkit-box-shadow:inset 0px 1px 3px rgba(0,0,0,0.2);background:#ebebeb -webkit-linear-gradient(#f4f4f4, #efefef 40%, #dcdcdc);color:#333}#buttonFormatted.selected,#buttonPlain.selected{-webkit-box-shadow:inset 0px 1px 5px rgba(0,0,0,0.2);background:#ebebeb -webkit-linear-gradient(#e4e4e4, #dfdfdf 40%, #dcdcdc);color:#333}#buttonFormatted:focus,#buttonPlain:focus{outline:0}#jsonpOpener,#jsonpCloser{padding:4px 0 0 8px;color:#000;margin-bottom:-6px}#jsonpCloser{margin-top:0}#formattedJson{padding-left:28px;padding-top:6px}pre{padding:36px 5px 5px 5px}.kvov{display:block;padding-left:20px;margin-left:-20px;position:relative}.collapsed{white-space:nowrap}.collapsed>.blockInner{display:none}.collapsed>.ell:after{content:"…";font-weight:bold}.collapsed>.ell{margin:0 4px;color:#888}.collapsed .kvov{display:inline}.e{width:20px;height:18px;display:block;position:absolute;left:-2px;top:1px;z-index:5;background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAD1JREFUeNpiYGBgOADE%2F3Hgw0DM4IRHgSsDFOzFInmMAQnY49ONzZRjDFiADT7dMLALiE8y4AGW6LoBAgwAuIkf%2F%2FB7O9sAAAAASUVORK5CYII%3D");background-repeat:no-repeat;background-position:center center;display:block;opacity:0.15}.collapsed>.e{-webkit-transform:rotate(-90deg);width:18px;height:20px;left:0px;top:0px}.e:hover{opacity:0.35}.e:active{opacity:0.5}.collapsed .kvov .e{display:none}.blockInner{display:block;padding-left:24px;border-left:1px dotted #bbb;margin-left:2px}#formattedJson,#jsonpOpener,#jsonpCloser{color:#333;font:13px/18px monospace}#formattedJson{color:#444}.b{font-weight:bold}.s{color:#0B7500;word-wrap:break-word}a:link,a:visited{text-decoration:none;color:inherit}a:hover,a:active{text-decoration:underline;color:#050}.bl,.nl,.n{font-weight:bold;color:#1A01CC}.k{color:#000}#formattingMsg{font:13px "Lucida Grande","Segoe UI","Tahoma";padding:10px 0 0 8px;margin:0;color:#333}#formattingMsg>svg{margin:0 7px;position:relative;top:1px}[hidden]{display:none !important}span{white-space:pre-wrap}@-webkit-keyframes spin{from{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(360deg)}}#spinner{-webkit-animation:spin 2s 0 infinite}*{-webkit-font-smoothing:antialiased}'
+              'body{-webkit-user-select:text;overflow-y:scroll !important;margin:0;position:relative}#optionBar{-webkit-user-select:none;display:block;position:absolute;top:9px;right:17px}#buttonJSONApi,#buttonFormatted,#buttonPlain{-webkit-border-radius:2px;-webkit-box-shadow:0px 1px 3px rgba(0,0,0,0.1);-webkit-user-select:none;background:-webkit-linear-gradient(#fafafa, #f4f4f4 40%, #e5e5e5);border:1px solid #aaa;color:#444;font-size:12px;margin-bottom:0px;min-width:4em;padding:3px 0;position:relative;z-index:10;display:inline-block;width:80px;text-shadow:1px 1px rgba(255,255,255,0.3)}#buttonJSONApi{margin-left:0;border-top-left-radius:0;border-bottom-left-radius:0}#buttonFormatted{margin-left:0;border-top-left-radius:0;border-bottom-left-radius:0}#buttonPlain{margin-right:0;border-top-right-radius:0;border-bottom-right-radius:0;border-right:none}#buttonJSONApi:hover,buttonFormatted:hover,#buttonPlain:hover{-webkit-box-shadow:0px 1px 3px rgba(0,0,0,0.2);background:#ebebeb -webkit-linear-gradient(#fefefe, #f8f8f8 40%, #e9e9e9);border-color:#999;color:#222}#buttonJSONApi:active,#buttonFormatted:active,#buttonPlain:active{-webkit-box-shadow:inset 0px 1px 3px rgba(0,0,0,0.2);background:#ebebeb -webkit-linear-gradient(#f4f4f4, #efefef 40%, #dcdcdc);color:#333}#buttonJSONApi.selected,#buttonFormatted.selected,#buttonPlain.selected{-webkit-box-shadow:inset 0px 1px 5px rgba(0,0,0,0.2);background:#ebebeb -webkit-linear-gradient(#e4e4e4, #dfdfdf 40%, #dcdcdc);color:#333}#buttonJSONApi:focus,#buttonFormatted:focus,#buttonPlain:focus{outline:0}#jsonpOpener,#jsonpCloser{padding:4px 0 0 8px;color:#000;margin-bottom:-6px}#jsonpCloser{margin-top:0}#formattedJson{padding-left:28px;padding-top:6px}pre{padding:36px 5px 5px 5px}.kvov{display:block;padding-left:20px;margin-left:-20px;position:relative}.collapsed{white-space:nowrap}.collapsed>.blockInner{display:none}.collapsed>.ell:after{content:"…";font-weight:bold}.collapsed>.ell{margin:0 4px;color:#888}.collapsed .kvov{display:inline}.e{width:20px;height:18px;display:block;position:absolute;left:-2px;top:1px;z-index:5;background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAD1JREFUeNpiYGBgOADE%2F3Hgw0DM4IRHgSsDFOzFInmMAQnY49ONzZRjDFiADT7dMLALiE8y4AGW6LoBAgwAuIkf%2F%2FB7O9sAAAAASUVORK5CYII%3D");background-repeat:no-repeat;background-position:center center;display:block;opacity:0.15}.collapsed>.e{-webkit-transform:rotate(-90deg);width:18px;height:20px;left:0px;top:0px}.e:hover{opacity:0.35}.e:active{opacity:0.5}.collapsed .kvov .e{display:none}.blockInner{display:block;padding-left:24px;border-left:1px dotted #bbb;margin-left:2px}#formattedJson,#jsonpOpener,#jsonpCloser{color:#333;font:13px/18px monospace}#formattedJson{color:#444}.b{font-weight:bold}.s{color:#0B7500;word-wrap:break-word}a:link,a:visited{text-decoration:none;color:inherit}a:hover,a:active{text-decoration:underline;color:#050}.bl,.nl,.n{font-weight:bold;color:#1A01CC}.k{color:#000}#formattingMsg{font:13px "Lucida Grande","Segoe UI","Tahoma";padding:10px 0 0 8px;margin:0;color:#333}#formattingMsg>svg{margin:0 7px;position:relative;top:1px}[hidden]{display:none !important}span{white-space:pre-wrap}@-webkit-keyframes spin{from{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(360deg)}}#spinner{-webkit-animation:spin 2s 0 infinite}*{-webkit-font-smoothing:antialiased}'
             ) ;
   
             // Add custom font name if set - FROM FUTURE
@@ -123,23 +124,26 @@
           
           // Create toggleFormat button
             var buttonPlain = document.createElement('button'),
-              buttonFormatted = document.createElement('button') ;
+              buttonFormatted = document.createElement('button'),
+              buttonJSONApi = document.createElement('button') ;
             buttonPlain.id = 'buttonPlain' ;
             buttonPlain.innerText = 'Raw' ;
             buttonFormatted.id = 'buttonFormatted' ;
             buttonFormatted.innerText = 'Parsed' ;
-            buttonFormatted.classList.add('selected') ;
+            buttonJSONApi.id = 'buttonJSONApi' ;
+            buttonJSONApi.innerText = 'JSONApi' ;
+            buttonJSONApi.classList.add('selected') ;
             
-            var plainOn = false ;
             buttonPlain.addEventListener(
               'click',
               function () {
                 // When plain button clicked...
-                if (!plainOn) {
-                  plainOn = true ;
+                if (pre.hidden) {
                   pre.hidden = false ;
                   jfContent.hidden = true ;
+                  jsonapiContent.hidden = true ;
 
+                  buttonJSONApi.classList.remove('selected') ;
                   buttonFormatted.classList.remove('selected') ;
                   buttonPlain.classList.add('selected') ;
                 }
@@ -151,11 +155,12 @@
               'click',
               function () {
                 // When formatted button clicked...
-                if (plainOn) {
-                  plainOn = false ;
+                if (jfContent.hidden) {
                   pre.hidden = true ;
                   jfContent.hidden = false ;
+                  jsonapiContent.hidden = true ;
 
+                  buttonJSONApi.classList.remove('selected') ;
                   buttonFormatted.classList.add('selected') ;
                   buttonPlain.classList.remove('selected') ;
                 }
@@ -163,9 +168,27 @@
               false
             ) ;
             
+            buttonJSONApi.addEventListener(
+              'click',
+              function () {
+                // When formatted button clicked...
+                if (jsonapiContent.hidden) {
+                  pre.hidden = true ;
+                  jfContent.hidden = true ;
+                  jsonapiContent.hidden = false ;
+
+                  buttonJSONApi.classList.add('selected') ;
+                  buttonFormatted.classList.remove('selected') ;
+                  buttonPlain.classList.remove('selected') ;
+                }
+              },
+              false
+            ) ;
+
             // Put it in optionBar
               optionBar.appendChild(buttonPlain) ;
               optionBar.appendChild(buttonFormatted) ;
+              optionBar.appendChild(buttonJSONApi) ;
 
           // Attach event handlers
             document.addEventListener(
@@ -195,7 +218,8 @@
           // Export parsed JSON for easy access in console
             setTimeout(function () {
               var script = document.createElement("script") ;
-              script.innerHTML = 'window.json = ' + msg[2] + ';' ;
+              script.innerHTML = 'window.json = ' + msg[2] + ';' +
+                                 'document.getElementById("jsonapiContent").innerHTML = renderJSON(json);';
               document.head.appendChild(script) ;
               console.log('JSON Formatter: Type "json" to inspect.') ;
             }, 100) ;
@@ -243,10 +267,15 @@
           }, 1000) ;
         
         // Send the contents of the PRE to the BG script
-          // Add jfContent DIV, ready to display stuff
             jfContent = document.createElement('div') ;
             jfContent.id = 'jfContent' ;
+            jfContent.hidden = true ;
             document.body.appendChild(jfContent) ;
+
+          // Add jsonapiContent DIV, ready to display stuff
+            jsonapiContent = document.createElement('div') ;
+            jsonapiContent.id = 'jsonapiContent' ;
+            document.body.appendChild(jsonapiContent) ;
 
             port.postMessage({
                 type: "LOCATION",
@@ -263,7 +292,7 @@
               text: pre.innerText,
               length: jsonLength
             });
-        
+
           // Now, this script will just wait to receive anything back via another port message. The returned message will be something like "NOT JSON" or "IS JSON"
       }
 

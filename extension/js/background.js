@@ -402,6 +402,7 @@
         return returnHTML ;
     }
 
+
   // Listen for requests from content pages wanting to set up a port
     chrome.extension.onConnect.addListener(function(port) {
 
