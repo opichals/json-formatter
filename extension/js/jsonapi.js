@@ -12,7 +12,7 @@
                         return;
                 }
 
-                return `<div><span style="color:blue;">${key}:</span> ${JSON.stringify(attributes[key])}</div>`
+                return renderJSONObjectKeyValue(key, attributes[key], aggregate);
             }) || [];
 
             const rels = data.relationships && Object.keys(data.relationships).map(key => {
@@ -22,6 +22,25 @@
             }) || [];
 
             return `<div style="margin-left: 2em;">name: <b><span style="font-size:medium;" title="${data.id}">${attributes['display-name']}</span></b>${attrs.join('\n')}${rels.join('\n')}</div>`;
+        }
+
+        function renderJSONObjectKeyValue(key, value, aggregate) {
+                return `<div><span style="color:blue;">${key}:</span> ${renderJSONAttributeValue(value, aggregate)}</div>`;
+        }
+
+        function renderJSONObject(obj, aggregate) {
+            const attrs = Object.keys(obj).map(key => renderJSONObjectKeyValue(key, obj[key], aggregate));
+            return `<div style="margin-left: 2em;">${attrs.join('\n')}</div>`;
+        }
+
+        function renderJSONAttributeValue(attr, aggregate) {
+            if (Array.isArray(attr)) {
+                return '[<br>\n' + attr.map(a => renderJSONObject(a, aggregate)).join('---\n') + ']<br>\n';
+            } else if (typeof attr === 'object') {
+                return renderJSONObject(attr, aggregate);
+            }
+
+            return JSON.stringify(attr);
         }
 
         function relUrl(rel) {
